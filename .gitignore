@@ -18,3 +18,8 @@ scripts/tsgen/test/bin/
 scripts/tsgen/test/output.txt
 
 plugins/spine*/spine-runtimes/
+
+# assets
+game/assets/warpedCity/PSD
+game/assets/warpedCity/SPRITES/player
+game/assets/warpedCity/SPRITES/misc
