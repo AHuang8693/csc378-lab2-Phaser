@@ -33,6 +33,7 @@ var config = {
 };
 
 var player;
+var emote;
 var stars;
 var bombs;
 var platforms;
@@ -51,7 +52,7 @@ function preload ()
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
-    this.load.spritesheet('main', 'assets/Greenbot_sprites.png', {frameWidth:48, frameHeight: 48});
+    this.load.spritesheet('player', 'assets/Greenbot_sprites.png', {frameWidth:48, frameHeight: 48});
     this.load.spritesheet('emote', 'assets/emote_sprites.png', {frameWidth:32, frameHeight:32});
 }
 
@@ -73,47 +74,66 @@ function create ()
     platforms.create(750, 220, 'ground');
 
     // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'main');
+    player = this.physics.add.sprite(100, 450, 'player');
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.15);
     player.setCollideWorldBounds(true);
 
-    //  Our player animations, turning, walking left and walking right.
+    //  Our player animations, still, walking, jumping, and idle
     this.anims.create({
         key: 'run',
-        frames: this.anims.generateFrameNumbers('main', { start: 9, end: 13 }),
+        frames: this.anims.generateFrameNumbers('player', { start: 9, end: 13 }),
         frameRate: 10,
         repeat: -1
     });
 
     this.anims.create({
         key: 'still',
-        frames: [ { key: 'main', frame: 0 } ],
+        frames: [ { key: 'player', frame: 0 } ],
         frameRate: 20
     });
 
     this.anims.create({
+        key: 'idle',
+        frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }),
+        frameRate: 5,
+        repeat: -1
+    });
+
+    this.anims.create({
         key: 'jump',
-        frames: [ { key: 'main', frame: 3 } ],
+        frames: [ { key: 'player', frame: 3 } ],
         frameRate: 20
     });
 
     this.anims.create({
         key: 'fall',
-        frames: [ { key: 'main', frame: 4 } ],
+        frames: [ { key: 'player', frame: 4 } ],
         frameRate: 20
     });
 
     this.anims.create({
         key: 'fallFast',
-        frames: [ { key: 'main', frame: 5 } ],
+        frames: [ { key: 'player', frame: 5 } ],
         frameRate: 20
     });
 
     this.anims.create({
         key: 'impact',
-        frames: this.anims.generateFrameNumbers('main', { start: 6, end: 7 }),
+        frames: this.anims.generateFrameNumbers('player', { start: 6, end: 7 }),
+        frameRate: 4
+    });
+
+    //emote
+    emote = this.physics.add.sprite(player.body.x, player.body.y, "emote").setImmovable(true);
+    emote.body.setAllowGravity(false);
+    emote.setVisible(false);
+
+    // emote animations
+    this.anims.create({
+        key: 'exclaim',
+        frames: this.anims.generateFrameNumbers('emote', { start: 16, end: 23 }),
         frameRate: 10
     });
 
@@ -169,11 +189,13 @@ function update ()
         player.setVelocityX(160);
         player.anims.play('run', true);
     }
-    else
+    else // no key press
     {
         player.setVelocityX(0);
-
-        player.anims.play('still');
+        player.anims.play('idle');
+        // player.once("animationrepeat", () => {
+        //         player.anims.play('idle');
+        //     });
     }
 
     if (!player.body.touching.down) {
