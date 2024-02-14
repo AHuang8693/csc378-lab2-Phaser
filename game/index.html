@@ -125,8 +125,8 @@ function create ()
         frameRate: 4
     });
 
-    //emote
-    emote = this.physics.add.sprite(player.body.x, player.body.y, "emote").setImmovable(true);
+    //emote (ignores gravity and is initially invisible)
+    emote = this.physics.add.sprite(player.x, player.y, "emote");
     emote.body.setAllowGravity(false);
     emote.setVisible(false);
 
@@ -192,10 +192,7 @@ function update ()
     else // no key press
     {
         player.setVelocityX(0);
-        player.anims.play('idle');
-        // player.once("animationrepeat", () => {
-        //         player.anims.play('idle');
-        //     });
+        player.anims.play('idle', true);
     }
 
     if (!player.body.touching.down) {
@@ -215,13 +212,21 @@ function update ()
     {
         player.setVelocityY(-330);
     }
+    
+    // emote sprite follows player
+    emote.setX(player.x);
+    emote.setY(player.y - 40);
 }
 
 //currently doesn't overide other animations, so never visible to player
 function hitGround (player, platforms) {
     if (fastFall == 1) {
         fastFall = 0;
-        player.anims.play('impact');
+        emote.setVisible(true);
+        emote.anims.play('exclaim');
+        emote.on("animationcomplete", ()=>{ //listen to when an animation completes, then run
+          emote.setVisible(false);
+        });
     }
 }
 
